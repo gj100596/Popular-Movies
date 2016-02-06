@@ -29,13 +29,11 @@ public class GridViewAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        String url = "http://image.tmdb.org/t/p/w154";
+        String url = "http://image.tmdb.org/t/p/w342";
         ImageView imageView = new ImageView(context);
 
         Picasso.with(context)
-                .load(url+movieList.get(position).image)
-                .resize(200, 200)
-                .centerCrop()
+                .load(url+movieList.get(position).getImage())
                 .into(imageView);
 
         return imageView;

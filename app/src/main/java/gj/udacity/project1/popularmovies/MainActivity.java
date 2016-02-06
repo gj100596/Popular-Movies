@@ -1,9 +1,12 @@
 package gj.udacity.project1.popularmovies;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -22,8 +25,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    GridView container;
-    ArrayList<MovieData> movieInfo;
+    private GridView container;
+    static ArrayList<MovieData> movieInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,17 @@ public class MainActivity extends AppCompatActivity {
         movieInfo = new ArrayList<>(0);
 
         container = (GridView) findViewById(R.id.container);
+        container.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent detailIntent = new Intent(MainActivity.this,MovieDetail.class);
+                Bundle positionArgument = new Bundle();
+                //positionArgument.("MovieList",movieInfo);
+                positionArgument.putInt("Position",position);
+                detailIntent.putExtras(positionArgument);
+                startActivity(detailIntent);
+            }
+        });
 
         loadMovieData();
     }
@@ -42,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loading.setMessage("Loading Movie Data");
 
-        String url = "http://api.themoviedb.org/3/discover/tv?sort_by=popularity.desc&api_key="+FixedData.API;
+        String url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key="+FixedData.API;
         JsonObjectRequest page = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
