@@ -1,99 +1,96 @@
 package gj.udacity.project1.popularmovies;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
+import android.content.Context;
+import android.content.res.Resources.Theme;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
+import android.support.v7.widget.ThemedSpinnerAdapter;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-
-    private GridView container;
-    static ArrayList<MovieData> movieInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        movieInfo = new ArrayList<>(0);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        container = (GridView) findViewById(R.id.container);
-        container.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        // Setup spinner
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(new MyAdapter(
+                toolbar.getContext(),
+                new String[]{
+                        "Popular Movies",
+                        "High Rating Movies",
+                }));
+
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detailIntent = new Intent(MainActivity.this,MovieDetail.class);
-                Bundle positionArgument = new Bundle();
-                //positionArgument.("MovieList",movieInfo);
-                positionArgument.putInt("Position",position);
-                detailIntent.putExtras(positionArgument);
-                startActivity(detailIntent);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // When the given dropdown item is selected, show its contents in the
+                // container view.
+                if (position == 0)
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.mainFragment, MovieList.newInstance("Popular"))
+                            .commit();
+                else
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.mainFragment, MovieList.newInstance("Rating"))
+                            .commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        loadMovieData();
     }
 
-    private void loadMovieData() {
-        final ProgressDialog loading = new ProgressDialog(this);
-        loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        loading.setMessage("Loading Movie Data");
+    private static class MyAdapter extends ArrayAdapter<String> implements ThemedSpinnerAdapter {
+        private final ThemedSpinnerAdapter.Helper mDropDownHelper;
 
-        String url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key="+FixedData.API;
-        JsonObjectRequest page = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        loading.cancel();
-                        try {
-                            JSONArray movies = jsonObject.getJSONArray("results");
+        public MyAdapter(Context context, String[] objects) {
+            super(context, android.R.layout.simple_list_item_activated_1, objects);
+            mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
+        }
 
-                            for(int i=0;i<movies.length();i++)
-                                movieInfo.add(new MovieData(movies.getJSONObject(i)));
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view;
 
-                            container.setAdapter(new GridViewAdapter(getApplicationContext(),movieInfo));
+            if (convertView == null) {
+                // Inflate the drop down using the helper's LayoutInflater
+                LayoutInflater inflater = mDropDownHelper.getDropDownViewInflater();
+                view = inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+            } else {
+                view = convertView;
+            }
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        loading.cancel();
-                        Toast.makeText(MainActivity.this, "Error Occurred! " + volleyError.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
+            TextView textView = (TextView) view.findViewById(android.R.id.text1);
+            textView.setText(getItem(position));
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-        loading.show();
-        queue.add(page);
-    }
+            return view;
+        }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R);
-        return super.onCreateOptionsMenu(menu);
+        @Override
+        public Theme getDropDownViewTheme() {
+            return mDropDownHelper.getDropDownViewTheme();
+        }
+
+        @Override
+        public void setDropDownViewTheme(Theme theme) {
+            mDropDownHelper.setDropDownViewTheme(theme);
+        }
     }
 }
-
-
