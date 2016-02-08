@@ -58,7 +58,8 @@ public class MovieDetail extends Fragment {
                 .load(url+currentMovie.getImage())
                 .into(moviePoster);
 
-        movieRating.setRating((float) currentMovie.getVoteAvg());
+        movieRating.setRating((float) currentMovie.getVoteAvg()/2);
+
 
         return view;
     }

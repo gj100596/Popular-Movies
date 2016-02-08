@@ -61,11 +61,6 @@ public class MovieList extends Fragment {
                         .replace(R.id.mainFragment,MovieDetail.newInstance(position))
                         .addToBackStack("Some")
                         .commit();
-                /*Intent detailIntent = new Intent(getActivity(),MovieDetail.class);
-                Bundle positionArgument = new Bundle();
-                positionArgument.putInt("Position",position);
-                detailIntent.putExtras(positionArgument);
-                startActivity(detailIntent);*/
             }
         });
 
@@ -95,7 +90,7 @@ public class MovieList extends Fragment {
                             for(int i=0;i<movies.length();i++)
                                 movieInfo.add(new MovieData(movies.getJSONObject(i)));
 
-                            container.setAdapter(new GridViewAdapter(getContext(),movieInfo));
+                            container.setAdapter(new GridViewAdapter(getActivity(),movieInfo));
 
                         } catch (JSONException e) {
                             e.printStackTrace();

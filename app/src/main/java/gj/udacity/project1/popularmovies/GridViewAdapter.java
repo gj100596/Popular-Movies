@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -31,9 +32,14 @@ public class GridViewAdapter extends ArrayAdapter {
 
         String url = "http://image.tmdb.org/t/p/w342";
         ImageView imageView = new ImageView(context);
+        imageView.setBackgroundResource(R.drawable.movie_poster);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        imageView.setLayoutParams(params);
 
         Picasso.with(context)
                 .load(url+movieList.get(position).getImage())
+                .placeholder(R.drawable.placeholder)
                 .into(imageView);
 
         return imageView;

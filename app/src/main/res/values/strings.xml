@@ -6,4 +6,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="popular">Popular Ones</string>
     <string name="rating">Highest Rated</string>
+    <string name="plot">Plot</string>
+    <string name="shows_poster_of_movie">Shows Poster of Movie</string>
 </resources>
