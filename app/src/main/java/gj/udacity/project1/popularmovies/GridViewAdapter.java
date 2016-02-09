@@ -40,6 +40,7 @@ public class GridViewAdapter extends ArrayAdapter {
         Picasso.with(context)
                 .load(url+movieList.get(position).getImage())
                 .placeholder(R.drawable.placeholder)
+                .resize(340,510)
                 .into(imageView);
 
         return imageView;

@@ -34,6 +34,7 @@ public class MovieDetail extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         optionNo = getArguments().getInt(ARG);
+        setRetainInstance(true);
     }
 
     @Override
@@ -56,6 +57,7 @@ public class MovieDetail extends Fragment {
         String url = "http://image.tmdb.org/t/p/w342";
         Picasso.with(getActivity())
                 .load(url+currentMovie.getImage())
+                .resize(340,510)
                 .into(moviePoster);
 
         movieRating.setRating((float) currentMovie.getVoteAvg()/2);

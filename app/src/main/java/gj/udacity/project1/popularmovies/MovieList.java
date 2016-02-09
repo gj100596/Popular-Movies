@@ -42,6 +42,8 @@ public class MovieList extends Fragment {
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(ARG);
+        setRetainInstance(true);
+
     }
 
     @Override
@@ -101,7 +103,7 @@ public class MovieList extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         loading.cancel();
-                        Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_LONG).show();
                     }
                 }
         );

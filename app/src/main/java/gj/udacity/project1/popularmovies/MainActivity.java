@@ -3,7 +3,7 @@ package gj.udacity.project1.popularmovies;
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Setup spinner
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(new MyAdapter(
                 toolbar.getContext(),
                 new String[]{
@@ -41,13 +41,19 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // When the given dropdown item is selected, show its contents in the
                 // container view.
-                if (position == 0)
+                String type;
+                if (position == 0 && savedInstanceState==null )
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, MovieList.newInstance("Popular"))
+                            .replace(R.id.mainFragment, MovieList.newInstance("Popular"), "Popular")
                             .commit();
-                else
+                else if(position == 0  && !(type=savedInstanceState.getString("Type")).equals("Popular")){
+                    if(type.equals("Rating"))
+                        spinner.setSelection(1);
+
+                }
+                else if(position == 1 && !(type=savedInstanceState.getString("Type")).equals("Rating"))
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, MovieList.newInstance("Rating"))
+                            .replace(R.id.mainFragment, MovieList.newInstance("Rating"), "Rating")
                             .commit();
             }
 
@@ -58,8 +64,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState){//}, PersistableBundle outPersistentState) {
+        Fragment currentFragment;
+        currentFragment = getSupportFragmentManager().findFragmentByTag("Popular");
+        if (currentFragment != null && currentFragment.isVisible())
+            outState.putString("Type", "Popular");
+        else {
+            currentFragment = getSupportFragmentManager().findFragmentByTag("Rating");
+            if (currentFragment != null && currentFragment.isVisible())
+                outState.putString("Type", "Rating");
+            else
+                outState.putString("Type", "Rating");
+        }
+        super.onSaveInstanceState(outState);//, outPersistentState);
+
     }
 
     private static class MyAdapter extends ArrayAdapter<String> implements ThemedSpinnerAdapter {
