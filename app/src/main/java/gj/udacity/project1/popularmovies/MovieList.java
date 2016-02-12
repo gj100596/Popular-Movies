@@ -3,6 +3,7 @@ package gj.udacity.project1.popularmovies;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,15 +50,21 @@ public class MovieList extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup containerView, Bundle savedInstanceState) {
 
+        if(savedInstanceState == null){
         View view = inflater.inflate(R.layout.fragment_movie_list,containerView,false);
 
         movieInfo = new ArrayList<>(0);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        MainActivity.spinner.setVisibility(View.VISIBLE);
 
         container = (GridView) view.findViewById(R.id.container);
 
         container.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                MainActivity.spinner.setVisibility(View.INVISIBLE);
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.mainFragment,MovieDetail.newInstance(position))
@@ -68,7 +75,8 @@ public class MovieList extends Fragment {
 
         loadMovieData();
 
-        return view;
+        return view;}
+        return null;
     }
 
     private void loadMovieData() {
@@ -77,7 +85,7 @@ public class MovieList extends Fragment {
         loading.setMessage("Loading Movie Data");
 
         String url;
-        if(type.equalsIgnoreCase("Popular"))
+        if(type.equalsIgnoreCase(getString(R.string.popular)))
             url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key="+FixedData.API;
         else
             url = "http://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&api_key="+FixedData.API;
@@ -92,7 +100,7 @@ public class MovieList extends Fragment {
                             for(int i=0;i<movies.length();i++)
                                 movieInfo.add(new MovieData(movies.getJSONObject(i)));
 
-                            container.setAdapter(new GridViewAdapter(getActivity(),movieInfo));
+                            container.setAdapter(new GridViewAdapter(getContext(),movieInfo));
 
                         } catch (JSONException e) {
                             e.printStackTrace();

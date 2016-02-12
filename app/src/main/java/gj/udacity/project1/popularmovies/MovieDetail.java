@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,19 +13,19 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class MovieDetail extends Fragment {
+public class MovieDetail extends Fragment implements View.OnClickListener{
 
     private static final java.lang.String ARG = "Position";
     private MovieData currentMovie;
     private int optionNo;
     private ImageView moviePoster;
-    private TextView movieTitle,moviePlot,movieDate;
+    private TextView movieTitle, moviePlot, movieDate;
     private RatingBar movieRating;
 
     public static MovieDetail newInstance(int position) {
 
         Bundle args = new Bundle();
-        args.putInt(ARG,position);
+        args.putInt(ARG, position);
         MovieDetail fragment = new MovieDetail();
         fragment.setArguments(args);
         return fragment;
@@ -40,7 +41,7 @@ public class MovieDetail extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.activity_movie_detail,container,false);
+        View view = inflater.inflate(R.layout.activity_movie_detail, container, false);
 
         currentMovie = MovieList.movieInfo.get(optionNo);
 
@@ -56,13 +57,28 @@ public class MovieDetail extends Fragment {
 
         String url = "http://image.tmdb.org/t/p/w342";
         Picasso.with(getActivity())
-                .load(url+currentMovie.getImage())
-                .resize(340,510)
+                .load(url + currentMovie.getImage())
+                .resize(340, 510)
                 .into(moviePoster);
 
-        movieRating.setRating((float) currentMovie.getVoteAvg()/2);
-
+        movieRating.setRating((float) currentMovie.getVoteAvg() / 2);
 
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()== android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == android.R.id.home)
+            getActivity().onBackPressed();
     }
 }
