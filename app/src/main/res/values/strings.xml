@@ -8,4 +8,6 @@
     <string name="rating">Highest Rated</string>
     <string name="plot">Plot</string>
     <string name="shows_poster_of_movie">Shows Poster of Movie</string>
+    <string name="info">Information</string>
+    <string name="loading">Loading Movie Data</string>
 </resources>

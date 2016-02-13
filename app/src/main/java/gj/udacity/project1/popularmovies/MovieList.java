@@ -43,14 +43,13 @@ public class MovieList extends Fragment {
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(ARG);
-        setRetainInstance(true);
+        //setRetainInstance(true);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup containerView, Bundle savedInstanceState) {
 
-        if(savedInstanceState == null){
         View view = inflater.inflate(R.layout.fragment_movie_list,containerView,false);
 
         movieInfo = new ArrayList<>(0);
@@ -68,21 +67,20 @@ public class MovieList extends Fragment {
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.mainFragment,MovieDetail.newInstance(position))
-                        .addToBackStack("Some")
+                        .addToBackStack(getString(R.string.info))
                         .commit();
             }
         });
 
         loadMovieData();
 
-        return view;}
-        return null;
+        return view;
     }
 
     private void loadMovieData() {
         final ProgressDialog loading = new ProgressDialog(getContext());
         loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        loading.setMessage("Loading Movie Data");
+        loading.setMessage(getString(R.string.loading));
 
         String url;
         if(type.equalsIgnoreCase(getString(R.string.popular)))

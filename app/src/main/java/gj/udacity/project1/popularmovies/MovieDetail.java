@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class MovieDetail extends Fragment implements View.OnClickListener{
+public class MovieDetail extends Fragment{
 
     private static final java.lang.String ARG = "Position";
     private MovieData currentMovie;
@@ -35,7 +34,7 @@ public class MovieDetail extends Fragment implements View.OnClickListener{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         optionNo = getArguments().getInt(ARG);
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class MovieDetail extends Fragment implements View.OnClickListener{
         String url = "http://image.tmdb.org/t/p/w342";
         Picasso.with(getActivity())
                 .load(url + currentMovie.getImage())
-                .resize(340, 510)
+               // .resize(340, 510)
                 .into(moviePoster);
 
         movieRating.setRating((float) currentMovie.getVoteAvg() / 2);
@@ -66,19 +65,4 @@ public class MovieDetail extends Fragment implements View.OnClickListener{
         return view;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()== android.R.id.home) {
-            getActivity().onBackPressed();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == android.R.id.home)
-            getActivity().onBackPressed();
-    }
 }
