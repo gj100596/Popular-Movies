@@ -10,12 +10,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/*
+It just inflate an image view to show movie poster
+ */
 public class GridViewAdapter extends ArrayAdapter {
 
-    private ArrayList<MovieData> movieList;
+    private ArrayList<MovieDataClass> movieList;
     private Context context;
 
-    public GridViewAdapter(Context context, ArrayList<MovieData> movieList) {
+    public GridViewAdapter(Context context, ArrayList<MovieDataClass> movieList) {
         super(context,movieList.size());
         this.movieList = movieList;
         this.context = context;
@@ -34,7 +37,7 @@ public class GridViewAdapter extends ArrayAdapter {
 
         Picasso.with(context)
                 .load(url+movieList.get(position).getImage())
-                //.placeholder(R.drawable.placeholder)
+                .placeholder(R.drawable.placeholder)
                 .into(imageView);
 
         return imageView;

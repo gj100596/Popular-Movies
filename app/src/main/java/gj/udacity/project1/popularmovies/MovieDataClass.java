@@ -3,12 +3,15 @@ package gj.udacity.project1.popularmovies;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MovieData {
+/*
+This class save data of all fetched movies.
+ */
+public class MovieDataClass {
     private String image,overview,releaseDate,movieTitle;
     private int movieId;
     private double voteAvg;
 
-    public MovieData(JSONObject movieJson){
+    public MovieDataClass(JSONObject movieJson){
         try {
             image = movieJson.getString("poster_path");
             movieId = movieJson.getInt("id");

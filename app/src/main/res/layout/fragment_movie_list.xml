@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:padding="@dimen/activity_vertical_margin"
     android:numColumns="auto_fit"
-    tools:context=".MovieList">
+    tools:context=".MovieListFragment">
 
 
 </GridView>

@@ -12,20 +12,23 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class MovieDetail extends Fragment{
+/*
+This fragment show detail of selected movie.
+ */
+public class MovieDetailFragment extends Fragment{
 
     private static final java.lang.String ARG = "Position";
-    private MovieData currentMovie;
+    private MovieDataClass currentMovie;
     private int optionNo;
     private ImageView moviePoster;
     private TextView movieTitle, moviePlot, movieDate;
     private RatingBar movieRating;
 
-    public static MovieDetail newInstance(int position) {
+    public static MovieDetailFragment newInstance(int position) {
 
         Bundle args = new Bundle();
         args.putInt(ARG, position);
-        MovieDetail fragment = new MovieDetail();
+        MovieDetailFragment fragment = new MovieDetailFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -34,15 +37,14 @@ public class MovieDetail extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         optionNo = getArguments().getInt(ARG);
-        //setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.activity_movie_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        currentMovie = MovieList.movieInfo.get(optionNo);
+        currentMovie = MovieListFragment.movieInfo.get(optionNo);
 
         movieDate = (TextView) view.findViewById(R.id.movieDate);
         moviePlot = (TextView) view.findViewById(R.id.moviePlot);
@@ -54,10 +56,12 @@ public class MovieDetail extends Fragment{
         movieTitle.setText(currentMovie.getMovieTitle());
         movieDate.setText(currentMovie.getReleaseDate());
 
+        /*Here a new request is being sent to fetch image but actually it won't bring whole image
+        back because volley would have cached the imaged previously when it called it first to show list.
+         */
         String url = "http://image.tmdb.org/t/p/w342";
         Picasso.with(getActivity())
                 .load(url + currentMovie.getImage())
-               // .resize(340, 510)
                 .into(moviePoster);
 
         movieRating.setRating((float) currentMovie.getVoteAvg() / 2);

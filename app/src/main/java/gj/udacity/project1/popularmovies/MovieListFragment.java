@@ -24,15 +24,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MovieList extends Fragment {
+/*
+This fragment load list of movies either popular ones or highest rated ones.
+This choice depend on variable "type", whose value I have received from Main Activity.
+ */
+public class MovieListFragment extends Fragment {
 
     private static final String ARG = "Type" ;
     private GridView container;
-    static ArrayList<MovieData> movieInfo;
+    static ArrayList<MovieDataClass> movieInfo;
     private String type;
 
-    public static MovieList newInstance(String type) {
-        MovieList fragment = new MovieList();
+    public static MovieListFragment newInstance(String type) {
+        MovieListFragment fragment = new MovieListFragment();
         Bundle arg = new Bundle();
         arg.putString(ARG,type);
         fragment.setArguments(arg);
@@ -43,8 +47,6 @@ public class MovieList extends Fragment {
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = getArguments().getString(ARG);
-        //setRetainInstance(true);
-
     }
 
     @Override
@@ -53,6 +55,7 @@ public class MovieList extends Fragment {
         View view = inflater.inflate(R.layout.fragment_movie_list,containerView,false);
 
         movieInfo = new ArrayList<>(0);
+        //Set Home button false. This is needed when we come from detail movie to popular/highest rating movie fragment
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         MainActivity.spinner.setVisibility(View.VISIBLE);
 
@@ -62,11 +65,13 @@ public class MovieList extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                //Show Detail of Movie
+
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 MainActivity.spinner.setVisibility(View.INVISIBLE);
 
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.mainFragment,MovieDetail.newInstance(position))
+                        .replace(R.id.mainFragment, MovieDetailFragment.newInstance(position))
                         .addToBackStack(getString(R.string.info))
                         .commit();
             }
@@ -95,8 +100,9 @@ public class MovieList extends Fragment {
                         try {
                             JSONArray movies = jsonObject.getJSONArray("results");
 
+                            //store the list of movie so that it can be used again
                             for(int i=0;i<movies.length();i++)
-                                movieInfo.add(new MovieData(movies.getJSONObject(i)));
+                                movieInfo.add(new MovieDataClass(movies.getJSONObject(i)));
 
                             container.setAdapter(new GridViewAdapter(getContext(),movieInfo));
 
