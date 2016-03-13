@@ -10,4 +10,8 @@
     <string name="shows_poster_of_movie">Shows Poster of Movie</string>
     <string name="info">Information</string>
     <string name="loading">Loading Movie Data</string>
+    <string name="trailer">Trailer</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

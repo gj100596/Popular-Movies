@@ -74,7 +74,38 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:text="@string/trailer"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/movie_detail_thin_line"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:id="@+id/movieTrailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trailer"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/reviewButton"
+            android:text="review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+
     </LinearLayout>
+
+
 
 
 </ScrollView>
