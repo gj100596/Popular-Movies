@@ -1,9 +1,9 @@
 package gj.udacity.project1.popularmovies.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +24,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import gj.udacity.project1.popularmovies.Activity.DetailActivity;
 import gj.udacity.project1.popularmovies.Activity.MainActivity;
-import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Adapter.GridViewAdapter;
+import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
 
@@ -65,13 +66,6 @@ public class MovieListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_movie_list, containerView, false);
 
         movieInfo = new ArrayList<>(0);
-        try {
-            //Set Home button false. This is needed when we come from detail movie to popular/highest rating movie fragment
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            MainActivity.spinner.setVisibility(View.VISIBLE);
-        } catch (NullPointerException e) {
-        }
-
 
         container = (GridView) view.findViewById(R.id.container);
 
@@ -81,19 +75,19 @@ public class MovieListFragment extends Fragment {
 
                 //Show Detail of Movie
 
-                try {
-                    if (!MainActivity.tabletDevice) {
-                        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        MainActivity.spinner.setVisibility(View.INVISIBLE);
-                    }
-                } catch (NullPointerException e) {
+                if(MainActivity.tabletDevice){
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.detailFragment,MovieDetailFragment.newInstance(position))
+                            .commit();
                 }
-
-
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.mainFragment, MovieDetailFragment.newInstance(position))
-                        .addToBackStack(getString(R.string.info))
-                        .commit();
+                else {
+                    Intent detail = new Intent(getActivity(), DetailActivity.class);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Position", position);
+                    detail.putExtras(arg);
+                    startActivity(detail);
+                }
             }
         });
 
@@ -126,10 +120,12 @@ public class MovieListFragment extends Fragment {
 
                             container.setAdapter(new GridViewAdapter(getContext(), movieInfo));
 
-                            getFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFragment, MovieDetailFragment.newInstance(0))
-                                    .addToBackStack(getString(R.string.info))
-                                    .commit();
+                            if(MainActivity.tabletDevice){
+                                getActivity().getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.detailFragment,MovieDetailFragment.newInstance(0))
+                                        .commit();
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();

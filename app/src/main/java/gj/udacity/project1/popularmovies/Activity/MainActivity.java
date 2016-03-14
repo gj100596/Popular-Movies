@@ -29,7 +29,7 @@ I have written comments at most point of code for explanation.
  */
 public class MainActivity extends AppCompatActivity {
     public static Spinner spinner;
-    public static boolean tabletDevice=false;
+    public static boolean tabletDevice = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(findViewById(R.id.staticFragment)!=null){
-            tabletDevice=true;
+        if (findViewById(R.id.detailFragment) != null) {
+            tabletDevice = true;
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.mainFragment, MovieDetailFragment.newInstance(-1))
+                    .replace(R.id.detailFragment, MovieDetailFragment.newInstance(-1))
                     .commit();
         }
 
@@ -77,24 +77,6 @@ public class MainActivity extends AppCompatActivity {
                                 .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.popular)), getString(R.string.popular))
                                 .commit();
                     }
-                    //If rotation was in Detail fragment, do nothing stay there only
-                    else if (lastSpinnerOption == -1) {
-                        if (getSupportFragmentManager().findFragmentByTag(getString(R.string.rating)) != null
-                                && getSupportFragmentManager().findFragmentByTag(getString(R.string.rating)).isVisible())
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.popular)), getString(R.string.popular))
-                                    .commit();
-                        else {
-                            /*
-                            AndroidStudio is showing warning here but, it is obvious this getSupportActionBar()
-                            cannot give null pointer as I have set setSupportActionbar() above.
-                             */
-                            if(!tabletDevice) {
-                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                                spinner.setVisibility(View.INVISIBLE);
-                            }
-                        }
-                    }
                     //And if 0th is clicked when last Fragment was in Popular Fragment no change needed.
                 }
 
@@ -109,18 +91,6 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.rating)), getString(R.string.rating))
                                 .commit();
-                    } else if (lastSpinnerOption == -1) {
-                        if (getSupportFragmentManager().findFragmentByTag(getString(R.string.popular)) != null
-                                && getSupportFragmentManager().findFragmentByTag(getString(R.string.popular)).isVisible())
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.rating)), getString(R.string.rating))
-                                    .commit();
-                        else {
-                            if(!tabletDevice) {
-                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                                spinner.setVisibility(View.INVISIBLE);
-                            }
-                        }
                     }
                 }
             }
@@ -133,10 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (spinner.getVisibility() == View.INVISIBLE)
-            outState.putInt("Position", -1);
-        else
-            outState.putInt("Position", spinner.getSelectedItemPosition());
+        outState.putInt("Position", spinner.getSelectedItemPosition());
         super.onSaveInstanceState(outState);
 
     }
@@ -145,11 +112,6 @@ public class MainActivity extends AppCompatActivity {
     //So I have overridden the onOptionItemSelected method.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-        }
         return super.onOptionsItemSelected(item);
     }
 
