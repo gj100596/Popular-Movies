@@ -1,4 +1,4 @@
-package gj.udacity.project1.popularmovies;
+package gj.udacity.project1.popularmovies.Activity;
 
 import android.content.Context;
 import android.content.res.Resources.Theme;
@@ -15,6 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import gj.udacity.project1.popularmovies.Fragments.MovieDetailFragment;
+import gj.udacity.project1.popularmovies.Fragments.MovieListFragment;
+import gj.udacity.project1.popularmovies.R;
+
 /*
 The Only Activity in whole App. It will inflate 3 type of fragments:
  1) Popular Fragment: Fragment showing popular movies
@@ -24,7 +28,8 @@ A spinner is used to go from one fragment to other
 I have written comments at most point of code for explanation.
  */
 public class MainActivity extends AppCompatActivity {
-    static Spinner spinner;
+    public static Spinner spinner;
+    public static boolean tabletDevice=false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -33,6 +38,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if(findViewById(R.id.staticFragment)!=null){
+            tabletDevice=true;
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mainFragment, MovieDetailFragment.newInstance(-1))
+                    .commit();
+        }
+
         // Setup spinner
         spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(new MyAdapter(
@@ -40,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{
                         getString(R.string.popular),
                         getString(R.string.rating),
+                        getString(R.string.favorite)
                 }));
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -75,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
                             AndroidStudio is showing warning here but, it is obvious this getSupportActionBar()
                             cannot give null pointer as I have set setSupportActionbar() above.
                              */
-
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                            spinner.setVisibility(View.INVISIBLE);
+                            if(!tabletDevice) {
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                                spinner.setVisibility(View.INVISIBLE);
+                            }
                         }
                     }
                     //And if 0th is clicked when last Fragment was in Popular Fragment no change needed.
@@ -101,8 +116,10 @@ public class MainActivity extends AppCompatActivity {
                                     .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.rating)), getString(R.string.rating))
                                     .commit();
                         else {
-                            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                            spinner.setVisibility(View.INVISIBLE);
+                            if(!tabletDevice) {
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                                spinner.setVisibility(View.INVISIBLE);
+                            }
                         }
                     }
                 }

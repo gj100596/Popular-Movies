@@ -1,4 +1,4 @@
-package gj.udacity.project1.popularmovies;
+package gj.udacity.project1.popularmovies.Data;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package gj.udacity.project1.popularmovies;
+package gj.udacity.project1.popularmovies.Fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -24,13 +24,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import gj.udacity.project1.popularmovies.Activity.MainActivity;
+import gj.udacity.project1.popularmovies.Data.FixedData;
+import gj.udacity.project1.popularmovies.Adapter.GridViewAdapter;
+import gj.udacity.project1.popularmovies.Data.MovieDataClass;
+import gj.udacity.project1.popularmovies.R;
+
 /*
 This fragment load list of movies either popular ones or highest rated ones.
 This choice depend on variable "type", whose value I have received from Main Activity.
  */
 public class MovieListFragment extends Fragment {
 
-    private static final String ARG = "Type" ;
+    private static final String ARG = "Type";
     private GridView container;
     static ArrayList<MovieDataClass> movieInfo;
     private String type;
@@ -38,26 +44,34 @@ public class MovieListFragment extends Fragment {
     public static MovieListFragment newInstance(String type) {
         MovieListFragment fragment = new MovieListFragment();
         Bundle arg = new Bundle();
-        arg.putString(ARG,type);
+        arg.putString(ARG, type);
         fragment.setArguments(arg);
         return fragment;
     }
 
     @Override
-    public void onCreate( Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        type = getArguments().getString(ARG);
+        Bundle args = getArguments();
+        if (args == null)
+            type = getString(R.string.popular);
+        else
+            type = getArguments().getString(ARG);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup containerView, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_movie_list,containerView,false);
+        View view = inflater.inflate(R.layout.fragment_movie_list, containerView, false);
 
         movieInfo = new ArrayList<>(0);
-        //Set Home button false. This is needed when we come from detail movie to popular/highest rating movie fragment
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        MainActivity.spinner.setVisibility(View.VISIBLE);
+        try {
+            //Set Home button false. This is needed when we come from detail movie to popular/highest rating movie fragment
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            MainActivity.spinner.setVisibility(View.VISIBLE);
+        } catch (NullPointerException e) {
+        }
+
 
         container = (GridView) view.findViewById(R.id.container);
 
@@ -67,8 +81,14 @@ public class MovieListFragment extends Fragment {
 
                 //Show Detail of Movie
 
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                MainActivity.spinner.setVisibility(View.INVISIBLE);
+                try {
+                    if (!MainActivity.tabletDevice) {
+                        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        MainActivity.spinner.setVisibility(View.INVISIBLE);
+                    }
+                } catch (NullPointerException e) {
+                }
+
 
                 getFragmentManager().beginTransaction()
                         .replace(R.id.mainFragment, MovieDetailFragment.newInstance(position))
@@ -88,10 +108,10 @@ public class MovieListFragment extends Fragment {
         loading.setMessage(getString(R.string.loading));
 
         String url;
-        if(type.equalsIgnoreCase(getString(R.string.popular)))
-            url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key="+FixedData.API;
+        if (type.equalsIgnoreCase(getString(R.string.popular)))
+            url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + FixedData.API;
         else
-            url = "http://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&api_key="+FixedData.API;
+            url = "http://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&api_key=" + FixedData.API;
         JsonObjectRequest page = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -101,10 +121,15 @@ public class MovieListFragment extends Fragment {
                             JSONArray movies = jsonObject.getJSONArray("results");
 
                             //store the list of movie so that it can be used again
-                            for(int i=0;i<movies.length();i++)
+                            for (int i = 0; i < movies.length(); i++)
                                 movieInfo.add(new MovieDataClass(movies.getJSONObject(i)));
 
-                            container.setAdapter(new GridViewAdapter(getContext(),movieInfo));
+                            container.setAdapter(new GridViewAdapter(getContext(), movieInfo));
+
+                            getFragmentManager().beginTransaction()
+                                    .replace(R.id.mainFragment, MovieDetailFragment.newInstance(0))
+                                    .addToBackStack(getString(R.string.info))
+                                    .commit();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

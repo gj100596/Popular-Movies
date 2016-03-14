@@ -1,4 +1,4 @@
-package gj.udacity.project1.popularmovies;
+package gj.udacity.project1.popularmovies.Adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -9,6 +9,9 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import gj.udacity.project1.popularmovies.Data.MovieDataClass;
+import gj.udacity.project1.popularmovies.R;
 
 /*
 It just inflate an image view to show movie poster

@@ -1,4 +1,4 @@
-package gj.udacity.project1.popularmovies;
+package gj.udacity.project1.popularmovies.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +19,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import gj.udacity.project1.popularmovies.Data.FixedData;
+import gj.udacity.project1.popularmovies.R;
 
 public class Review extends Fragment {
 
@@ -59,7 +62,7 @@ public class Review extends Fragment {
     }
 
     private void loadData() {
-        String url = "http://api.themoviedb.org/3/movie/"+movieId+"/reviews?&api_key="+FixedData.API   ;
+        String url = "http://api.themoviedb.org/3/movie/"+movieId+"/reviews?&api_key="+ FixedData.API   ;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
