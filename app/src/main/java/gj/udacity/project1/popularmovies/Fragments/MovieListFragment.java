@@ -72,9 +72,7 @@ public class MovieListFragment extends Fragment {
         container.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 //Show Detail of Movie
-
                 if(MainActivity.tabletDevice){
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
@@ -90,10 +88,17 @@ public class MovieListFragment extends Fragment {
                 }
             }
         });
-
-        loadMovieData();
+        
+        if(type.equals(getString(R.string.favorite)))
+            loadSavedMovie();
+        else
+            loadMovieData();
 
         return view;
+    }
+
+    private void loadSavedMovie() {
+
     }
 
     private void loadMovieData() {

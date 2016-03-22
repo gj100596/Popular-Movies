@@ -8,7 +8,7 @@ This class save data of all fetched movies.
  */
 public class MovieDataClass {
     private String image,overview,releaseDate,movieTitle;
-    private int movieId;
+    private long movieId;
     private double voteAvg;
 
     public MovieDataClass(JSONObject movieJson){
@@ -28,7 +28,7 @@ public class MovieDataClass {
         return voteAvg;
     }
 
-    public int getMovieId() {
+    public long getMovieId() {
         return movieId;
     }
 

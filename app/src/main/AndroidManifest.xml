@@ -28,6 +28,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="gj.udacity.project1.popularmovies.Activity.MainActivity" />
         </activity>
+
+        <provider
+            android:authorities="gj.udacity.project1.popularmovies"
+            android:name=".DBPackage.DBContentProvider"/>
     </application>
 
 </manifest>

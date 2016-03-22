@@ -50,6 +50,12 @@
                     android:layout_height="wrap_content"
                     android:numStars="5"
                     android:stepSize="0.01" />
+
+                <Button
+                    android:id="@+id/movieFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Favorite"/>
             </LinearLayout>
 
         </LinearLayout>

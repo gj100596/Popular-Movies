@@ -40,7 +40,7 @@ public class MovieDetailFragment extends Fragment {
     private ImageView moviePoster;
     private TextView movieTitle, moviePlot, movieDate, movieTrailer;
     private RatingBar movieRating;
-    private Button reviewButton;
+    private Button reviewButton,favoriteButton;
 
     public static MovieDetailFragment newInstance(int position) {
 
@@ -72,6 +72,7 @@ public class MovieDetailFragment extends Fragment {
             movieRating = (RatingBar) view.findViewById(R.id.movieRating);
             movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
             reviewButton = (Button) view.findViewById(R.id.reviewButton);
+            favoriteButton = (Button) view.findViewById(R.id.movieFavorite);
 
             moviePlot.setText(currentMovie.getOverview());
             movieTitle.setText(currentMovie.getMovieTitle());
@@ -100,9 +101,17 @@ public class MovieDetailFragment extends Fragment {
                     getFragmentManager().beginTransaction().replace(R.id.mainFragment, Review.newInstance("" + currentMovie.getMovieId())).commit();
                 }
             });
+
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //insert();
+                }
+            });
         }
         return view;
     }
+
 
     private void youtubeIntent() {
 

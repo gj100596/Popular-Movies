@@ -93,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
                                 .commit();
                     }
                 }
+                else if(position == 2){
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.favorite)), getString(R.string.favorite))
+                            .commit();
+                }
             }
 
             @Override

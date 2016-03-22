@@ -4,9 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by Gaurav on 16-03-2016.
- */
 public class DBHelper extends SQLiteOpenHelper {
     public static final int VERSION = 1;
     public static final String DB_FILE_NAME = "movie.db";
@@ -18,20 +15,20 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        String query = "create table " + DBContract.TABLE + "("+
-                        DBContract._ID + "VARCHAR2(50)" +
-                        DBContract.COLUMN_IMAGE_URL + "VARCCHAR2(50)" +
-                        DBContract.COLUMN_MOVIE_TITLE + "VARCCHAR2(50)" +
-                        DBContract.COLUMN_OVERVIEW + "VARCCHAR2(400)" +
-                        DBContract.COLUMN_VOTE_AVG + "REAL" +
-                        DBContract.COLUMN_RELEASE_DATE + "VARCHAR(20));";
+        String query = "create table " + DBContract.MovieEntry.TABLE + "("+
+                        DBContract.MovieEntry._ID + "VARCHAR2(50)" +
+                        DBContract.MovieEntry.COLUMN_IMAGE_URL + "VARCCHAR2(50)" +
+                        DBContract.MovieEntry.COLUMN_MOVIE_TITLE + "VARCCHAR2(50)" +
+                        DBContract.MovieEntry.COLUMN_OVERVIEW + "VARCCHAR2(400)" +
+                        DBContract.MovieEntry.COLUMN_VOTE_AVG + "REAL" +
+                        DBContract.MovieEntry.COLUMN_RELEASE_DATE + "VARCHAR(20));";
 
         db.execSQL(query);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + DBContract.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS" + DBContract.MovieEntry.TABLE);
         onCreate(db);
     }
 }
