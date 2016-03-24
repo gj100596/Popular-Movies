@@ -2,7 +2,6 @@ package gj.udacity.project1.popularmovies.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -28,8 +27,6 @@ import java.util.ArrayList;
 import gj.udacity.project1.popularmovies.Activity.DetailActivity;
 import gj.udacity.project1.popularmovies.Activity.MainActivity;
 import gj.udacity.project1.popularmovies.Adapter.GridViewAdapter;
-import gj.udacity.project1.popularmovies.DBPackage.DBContract;
-import gj.udacity.project1.popularmovies.DBPackage.DBCursorAdapter;
 import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
@@ -41,6 +38,7 @@ This choice depend on variable "type", whose value I have received from Main Act
 public class MovieListFragment extends Fragment {
 
     private static final String ARG = "Type";
+
     private GridView container;
     static ArrayList<MovieDataClass> movieInfo;
     private String type;
@@ -76,13 +74,12 @@ public class MovieListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Show Detail of Movie
-                if(MainActivity.tabletDevice){
+                if (MainActivity.tabletDevice) {
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.detailFragment,MovieDetailFragment.newInstance(position))
+                            .replace(R.id.detailFragment, MovieDetailFragment.newInstance(position))
                             .commit();
-                }
-                else {
+                } else {
                     Intent detail = new Intent(getActivity(), DetailActivity.class);
                     Bundle arg = new Bundle();
                     arg.putInt("Position", position);
@@ -91,24 +88,10 @@ public class MovieListFragment extends Fragment {
                 }
             }
         });
-        
-        if(type.equals(getString(R.string.favorite)))
-            loadSavedMovie();
-        else
-            loadMovieData();
+
+        loadMovieData();
 
         return view;
-    }
-
-    private void loadSavedMovie() {
-        String sortOrder = DBContract.MovieEntry.COLUMN_RELEASE_DATE + " ASC";
-
-        Cursor cur = getActivity().getContentResolver().query(DBContract.MovieEntry.CONTENT_URI,
-                null, null, null, sortOrder);
-
-        DBCursorAdapter adapter = new DBCursorAdapter(getActivity(), cur, 0);
-
-        container.setAdapter(adapter);
     }
 
     private void loadMovieData() {
@@ -135,10 +118,10 @@ public class MovieListFragment extends Fragment {
 
                             container.setAdapter(new GridViewAdapter(getContext(), movieInfo));
 
-                            if(MainActivity.tabletDevice){
+                            if (MainActivity.tabletDevice) {
                                 getActivity().getSupportFragmentManager()
                                         .beginTransaction()
-                                        .replace(R.id.detailFragment,MovieDetailFragment.newInstance(0))
+                                        .replace(R.id.detailFragment, MovieDetailFragment.newInstance(0))
                                         .commit();
                             }
 
@@ -161,5 +144,3 @@ public class MovieListFragment extends Fragment {
         queue.add(page);
     }
 }
-
-

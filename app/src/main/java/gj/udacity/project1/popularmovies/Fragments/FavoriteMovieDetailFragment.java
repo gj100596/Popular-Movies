@@ -1,11 +1,14 @@
 package gj.udacity.project1.popularmovies.Fragments;
 
-import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,28 +30,48 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import gj.udacity.project1.popularmovies.DBPackage.DBContract;
+import gj.udacity.project1.popularmovies.DBPackage.DBContract.MovieEntry;
 import gj.udacity.project1.popularmovies.Data.FixedData;
-import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
 
 /*
 This fragment show detail of selected movie.
  */
-public class MovieDetailFragment extends Fragment{
+public class FavoriteMovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private static final java.lang.String ARG = "Position";
-    private MovieDataClass currentMovie;
-    private int optionNo;
+    private static final String ARG = "ID";
+
+    private long movieID;
+
+    private static final String[] PROJECTION_COLUMNS = {
+            MovieEntry.TABLE + "." + MovieEntry._ID,
+            MovieEntry.COLUMN_IMAGE_URL,
+            MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieEntry.COLUMN_OVERVIEW,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_VOTE_AVG
+    };
+
+    // these constants correspond to the projection defined above, and must change if the
+    // projection changes
+    private static final int ID_PROJECTION_NO = 0;
+    private static final int IMAGE_PROJECTION_NO = 1;
+    private static final int TITLE_PROJECTION_NO = 2;
+    private static final int OVERVIEW_PROJECTION_NO = 3;
+    private static final int RELEASE_PROJECTION_NO = 4;
+    private static final int VOTE_AVG_PROJECTION_NO = 5;
+
+
     private ImageView moviePoster;
     private TextView movieTitle, moviePlot, movieDate, movieTrailer;
     private RatingBar movieRating;
     private Button reviewButton,favoriteButton;
 
-    public static MovieDetailFragment newInstance(int position) {
+    public static FavoriteMovieDetailFragment newInstance(long id) {
 
         Bundle args = new Bundle();
-        args.putInt(ARG, position);
-        MovieDetailFragment fragment = new MovieDetailFragment();
+        args.putLong(ARG, id);
+        FavoriteMovieDetailFragment fragment = new FavoriteMovieDetailFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,16 +79,13 @@ public class MovieDetailFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        optionNo = getArguments().getInt(ARG);
+        movieID = getArguments().getLong(ARG);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-
-        if (optionNo != -1) {
-            currentMovie = MovieListFragment.movieInfo.get(optionNo);
 
             movieDate = (TextView) view.findViewById(R.id.movieDate);
             moviePlot = (TextView) view.findViewById(R.id.moviePlot);
@@ -75,20 +95,6 @@ public class MovieDetailFragment extends Fragment{
             movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
             reviewButton = (Button) view.findViewById(R.id.reviewButton);
             favoriteButton = (Button) view.findViewById(R.id.movieFavorite);
-
-            moviePlot.setText(currentMovie.getOverview());
-            movieTitle.setText(currentMovie.getMovieTitle());
-            movieDate.setText(currentMovie.getReleaseDate());
-
-        /*Here a new request is being sent to fetch image but actually it won't bring whole image
-        back because volley would have cached the imaged previously when it called it first to show list.
-         */
-            String url = "http://image.tmdb.org/t/p/w342";
-            Picasso.with(getActivity())
-                    .load(url + currentMovie.getImage())
-                    .into(moviePoster);
-
-            movieRating.setRating((float) currentMovie.getVoteAvg() / 2);
 
             movieTrailer.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -100,34 +106,25 @@ public class MovieDetailFragment extends Fragment{
             reviewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getFragmentManager().beginTransaction().replace(R.id.mainFragment, Review.newInstance("" + currentMovie.getMovieId())).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.mainFragment,
+                            Review.newInstance("" + movieID)).commit();
                 }
             });
 
             favoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    ContentValues values = new ContentValues();
-                    values.put(DBContract.MovieEntry._ID,currentMovie.getMovieId());
-                    values.put(DBContract.MovieEntry.COLUMN_IMAGE_URL,currentMovie.getImage());
-                    values.put(DBContract.MovieEntry.COLUMN_MOVIE_TITLE,currentMovie.getMovieTitle());
-                    values.put(DBContract.MovieEntry.COLUMN_OVERVIEW,currentMovie.getOverview());
-                    values.put(DBContract.MovieEntry.COLUMN_VOTE_AVG,currentMovie.getVoteAvg());
-                    values.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE,currentMovie.getReleaseDate());
-
-                    getActivity().getContentResolver().insert(DBContract.BASE_URI,values);
+                    getActivity().getContentResolver().delete(DBContract.MovieEntry.buildLocationUri(movieID),null,null);
                     //insert();
                 }
             });
-        }
         return view;
     }
 
 
     private void youtubeIntent() {
 
-        String url = "http://api.themoviedb.org/3/movie/" + currentMovie.getMovieId() + "/videos?&api_key=" + FixedData.API;
+        String url = "http://api.themoviedb.org/3/movie/" + movieID + "/videos?&api_key=" + FixedData.API;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -157,4 +154,37 @@ public class MovieDetailFragment extends Fragment{
         queue.add(detail);
     }
 
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                getActivity(),
+                DBContract.MovieEntry.buildLocationUri(movieID),
+                PROJECTION_COLUMNS,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        moviePlot.setText(data.getString(OVERVIEW_PROJECTION_NO));
+        movieTitle.setText(data.getString(TITLE_PROJECTION_NO));
+        movieDate.setText(data.getString(RELEASE_PROJECTION_NO));
+
+        /*Here a new request is being sent to fetch image but actually it won't bring whole image
+        back because volley would have cached the imaged previously when it called it first to show list.
+         */
+        String url = "http://image.tmdb.org/t/p/w342";
+        Picasso.with(getActivity())
+                .load(url + data.getString(IMAGE_PROJECTION_NO))
+                .into(moviePoster);
+
+        movieRating.setRating((float) data.getDouble(VOTE_AVG_PROJECTION_NO) / 2);
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+
+    }
 }

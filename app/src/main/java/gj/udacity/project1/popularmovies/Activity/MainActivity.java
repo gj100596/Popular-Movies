@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import gj.udacity.project1.popularmovies.Fragments.FavoriteMovieListFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieDetailFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieListFragment;
 import gj.udacity.project1.popularmovies.R;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if(position == 2){
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.favorite)), getString(R.string.favorite))
+                            .replace(R.id.mainFragment, FavoriteMovieListFragment.newInstance(), getString(R.string.favorite))
                             .commit();
                 }
             }
