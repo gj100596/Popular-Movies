@@ -16,12 +16,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String query = "create table " + DBContract.MovieEntry.TABLE + "("+
-                        DBContract.MovieEntry._ID + "VARCHAR2(50)" +
-                        DBContract.MovieEntry.COLUMN_IMAGE_URL + "VARCCHAR2(50)" +
-                        DBContract.MovieEntry.COLUMN_MOVIE_TITLE + "VARCCHAR2(50)" +
-                        DBContract.MovieEntry.COLUMN_OVERVIEW + "VARCCHAR2(400)" +
-                        DBContract.MovieEntry.COLUMN_VOTE_AVG + "REAL" +
-                        DBContract.MovieEntry.COLUMN_RELEASE_DATE + "VARCHAR(20));";
+                        DBContract.MovieEntry._ID+ " INTEGER," +
+                        DBContract.MovieEntry.COLUMN_IMAGE_URL + " VARCCHAR2(50)," +
+                        DBContract.MovieEntry.COLUMN_MOVIE_TITLE + " VARCCHAR2(50)," +
+                        DBContract.MovieEntry.COLUMN_OVERVIEW + " VARCCHAR2(400)," +
+                        DBContract.MovieEntry.COLUMN_VOTE_AVG + " REAL," +
+                        DBContract.MovieEntry.COLUMN_RELEASE_DATE + " VARCHAR(20));";
 
         db.execSQL(query);
     }

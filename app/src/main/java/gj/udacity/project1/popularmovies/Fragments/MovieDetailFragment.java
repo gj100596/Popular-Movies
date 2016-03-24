@@ -1,5 +1,6 @@
 package gj.udacity.project1.popularmovies.Fragments;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import gj.udacity.project1.popularmovies.DBPackage.DBContract;
 import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
@@ -105,6 +107,16 @@ public class MovieDetailFragment extends Fragment {
             favoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    ContentValues values = new ContentValues();
+                    values.put(DBContract.MovieEntry._ID,currentMovie.getMovieId());
+                    values.put(DBContract.MovieEntry.COLUMN_IMAGE_URL,currentMovie.getImage());
+                    values.put(DBContract.MovieEntry.COLUMN_MOVIE_TITLE,currentMovie.getMovieTitle());
+                    values.put(DBContract.MovieEntry.COLUMN_OVERVIEW,currentMovie.getOverview());
+                    values.put(DBContract.MovieEntry.COLUMN_VOTE_AVG,currentMovie.getVoteAvg());
+                    values.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE,currentMovie.getReleaseDate());
+
+                    getActivity().getContentResolver().insert(DBContract.BASE_URI,values);
                     //insert();
                 }
             });

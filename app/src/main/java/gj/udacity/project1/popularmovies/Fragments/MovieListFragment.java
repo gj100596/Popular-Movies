@@ -2,6 +2,7 @@ package gj.udacity.project1.popularmovies.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import gj.udacity.project1.popularmovies.Activity.DetailActivity;
 import gj.udacity.project1.popularmovies.Activity.MainActivity;
 import gj.udacity.project1.popularmovies.Adapter.GridViewAdapter;
+import gj.udacity.project1.popularmovies.DBPackage.DBContract;
+import gj.udacity.project1.popularmovies.DBPackage.DBCursorAdapter;
 import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
@@ -98,7 +101,14 @@ public class MovieListFragment extends Fragment {
     }
 
     private void loadSavedMovie() {
+        String sortOrder = DBContract.MovieEntry.COLUMN_RELEASE_DATE + " ASC";
 
+        Cursor cur = getActivity().getContentResolver().query(DBContract.MovieEntry.CONTENT_URI,
+                null, null, null, sortOrder);
+
+        DBCursorAdapter adapter = new DBCursorAdapter(getActivity(), cur, 0);
+
+        container.setAdapter(adapter);
     }
 
     private void loadMovieData() {

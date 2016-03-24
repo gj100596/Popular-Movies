@@ -5,9 +5,6 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Created by Gaurav on 16-03-2016.
- */
 public class DBContract {
 
     public static final String CONTENT_AUTHORITY = "gj.udacity.project1.popularmovies";
