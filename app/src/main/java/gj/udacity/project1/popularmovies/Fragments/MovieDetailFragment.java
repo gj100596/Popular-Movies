@@ -6,12 +6,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -23,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,9 +40,10 @@ public class MovieDetailFragment extends Fragment{
     private MovieDataClass currentMovie;
     private int optionNo;
     private ImageView moviePoster;
-    private TextView movieTitle, moviePlot, movieDate, movieTrailer;
+    private TextView movieTitle, moviePlot, movieDate;
     private RatingBar movieRating;
-    private Button reviewButton,favoriteButton;
+    private LinearLayout movieTrailerList,movieReviewList;
+    private ImageView favoriteButton;
 
     public static MovieDetailFragment newInstance(int position) {
 
@@ -72,9 +73,10 @@ public class MovieDetailFragment extends Fragment{
             movieTitle = (TextView) view.findViewById(R.id.movieTitle);
             moviePoster = (ImageView) view.findViewById(R.id.moviePoster);
             movieRating = (RatingBar) view.findViewById(R.id.movieRating);
-            movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
-            reviewButton = (Button) view.findViewById(R.id.reviewButton);
-            favoriteButton = (Button) view.findViewById(R.id.movieFavorite);
+            //reviewButton = (Button) view.findViewById(R.id.reviewButton);
+            favoriteButton = (ImageView) view.findViewById(R.id.movieFavorite);
+            movieTrailerList = (LinearLayout) view.findViewById(R.id.movieTrailerList);
+            movieReviewList = (LinearLayout) view.findViewById(R.id.movieReviewList);
 
             moviePlot.setText(currentMovie.getOverview());
             movieTitle.setText(currentMovie.getMovieTitle());
@@ -90,19 +92,8 @@ public class MovieDetailFragment extends Fragment{
 
             movieRating.setRating((float) currentMovie.getVoteAvg() / 2);
 
-            movieTrailer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    youtubeIntent();
-                }
-            });
-
-            reviewButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getFragmentManager().beginTransaction().replace(R.id.mainFragment, Review.newInstance("" + currentMovie.getMovieId())).commit();
-                }
-            });
+            loadTrailer();
+            loadReviews();
 
             favoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -117,6 +108,7 @@ public class MovieDetailFragment extends Fragment{
                     values.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE,currentMovie.getReleaseDate());
 
                     getActivity().getContentResolver().insert(DBContract.BASE_URI,values);
+                    favoriteButton.setImageResource(R.drawable.ic_star_black_36dp);
                     //insert();
                 }
             });
@@ -124,25 +116,49 @@ public class MovieDetailFragment extends Fragment{
         return view;
     }
 
-
-    private void youtubeIntent() {
-
+    private void loadTrailer() {
         String url = "http://api.themoviedb.org/3/movie/" + currentMovie.getMovieId() + "/videos?&api_key=" + FixedData.API;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        String trailerKey = null;
+                        JSONArray trailersArray = null;
                         try {
-                            trailerKey = jsonObject.getJSONArray("results").getJSONObject(0).getString("key");
-                            Log.e("ssd", trailerKey);
+                            ImageView trailerImage = null;
+                            trailersArray = jsonObject.getJSONArray("results");
+                            for(int position=0;position<trailersArray.length();position++) {
+                                JSONObject trailerDetail = new JSONObject(trailersArray.getString(position));
+                                trailerImage = new ImageView(movieTrailerList.getContext());
+                                String key = trailerDetail.getString("key");
+                                trailerImage.setTag(key);
+
+                                trailerImage.setPadding(10,0,10,0);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                                trailerImage.setLayoutParams(params);
+
+                                Picasso.with(getActivity())
+                                        .load("http://img.youtube.com/vi/" + key + "/sddefault.jpg")
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(trailerImage);
+
+                                movieTrailerList.addView(trailerImage);
+                            }
+                            assert trailerImage != null;
+                            trailerImage.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent youtube = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" +
+                                            v.getTag().toString()));
+                                    getActivity().startActivity(youtube);
+                                }
+                            });
+
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Log.e("sd", "Sdsd");
-                        }
-                        Intent youtube = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerKey));
-                        startActivity(youtube);
-
+                        } catch (NullPointerException e){}
                     }
                 },
                 new Response.ErrorListener() {
@@ -157,4 +173,52 @@ public class MovieDetailFragment extends Fragment{
         queue.add(detail);
     }
 
+    private void loadReviews() {
+        String url = "http://api.themoviedb.org/3/movie/" + currentMovie.getMovieId() + "/reviews?&api_key=" + FixedData.API;
+        JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        JSONArray reviewsArray = null;
+                        try {
+                            reviewsArray = jsonObject.getJSONArray("results");
+                            for (int position = 0; position < reviewsArray.length(); position++) {
+                                JSONObject reviewDetail = new JSONObject(reviewsArray.getString(position));
+
+                                LinearLayout review = new LinearLayout(movieReviewList.getContext());
+                                review.setOrientation(LinearLayout.VERTICAL);
+
+                                TextView author = new TextView(review.getContext());
+                                author.setText(reviewDetail.getString("author"));
+                                TextView comment = new TextView(review.getContext());
+                                author.setText(reviewDetail.getString("content"));
+
+                                review.addView(author);
+                                review.addView(comment);
+
+                                review.setPadding(10, 0, 10, 0);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                                review.setLayoutParams(params);
+
+                                movieReviewList.addView(review);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }
+        );
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        queue.add(detail);
+    }
 }

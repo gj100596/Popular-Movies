@@ -62,7 +62,7 @@ public class DBContentProvider extends ContentProvider {
 
     private Cursor getFavoriteMovieDetail(Uri uri, String[] projection, String sortOrder) {
         String MovieIDSelectionString = DBContract.MovieEntry.TABLE+
-                "." + DBContract.MovieEntry._ID + " = ? ";
+                "." + DBContract.MovieEntry._ID + "=?";
 
         return mOpenHelper.getReadableDatabase().query(
                 DBContract.MovieEntry.TABLE,

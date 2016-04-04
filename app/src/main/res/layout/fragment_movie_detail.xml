@@ -15,6 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/movie_detail_top_banner"
+            android:background="@drawable/border"
             android:orientation="horizontal">
 
             <ImageView
@@ -51,67 +52,114 @@
                     android:numStars="5"
                     android:stepSize="0.01" />
 
-                <Button
+                <ImageView
                     android:id="@+id/movieFavorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Favorite"/>
+                    android:contentDescription="@string/favorite"
+                    android:src="@drawable/ic_star_border_black_36dp" />
             </LinearLayout>
 
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="@string/plot"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textStyle="bold" />
+            android:background="@drawable/border"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/movie_detail_thin_line"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:background="@android:color/black" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/plot"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/moviePlot"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movie_detail_thin_line"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:background="@android:color/black" />
 
-        <TextView
+            <TextView
+                android:id="@+id/moviePlot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="@string/trailer"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textStyle="bold" />
+            android:background="@drawable/border"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/movie_detail_thin_line"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:background="@android:color/black" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/trailer"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/movieTrailer"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movie_detail_thin_line"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:background="@android:color/black" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/movieTrailerList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Trailer"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@drawable/border"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <Button
-            android:id="@+id/reviewButton"
-            android:text="review"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/review"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movie_detail_thin_line"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:background="@android:color/black" />
 
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/movieReviewList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </HorizontalScrollView>
+
+        </LinearLayout>
 
     </LinearLayout>
-
-
 
 
 </ScrollView>

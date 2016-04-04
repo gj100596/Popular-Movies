@@ -9,11 +9,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -37,9 +41,10 @@ import gj.udacity.project1.popularmovies.R;
 /*
 This fragment show detail of selected movie.
  */
-public class FavoriteMovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FavoriteMovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String ARG = "ID";
+    private static final int CURSORLOADER_ID = 2;
 
     private long movieID;
 
@@ -65,7 +70,7 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
     private ImageView moviePoster;
     private TextView movieTitle, moviePlot, movieDate, movieTrailer;
     private RatingBar movieRating;
-    private Button reviewButton,favoriteButton;
+    private ImageView reviewButton, favoriteButton;
 
     public static FavoriteMovieDetailFragment newInstance(long id) {
 
@@ -80,6 +85,7 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         movieID = getArguments().getLong(ARG);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -87,40 +93,62 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
 
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-            movieDate = (TextView) view.findViewById(R.id.movieDate);
-            moviePlot = (TextView) view.findViewById(R.id.moviePlot);
-            movieTitle = (TextView) view.findViewById(R.id.movieTitle);
-            moviePoster = (ImageView) view.findViewById(R.id.moviePoster);
-            movieRating = (RatingBar) view.findViewById(R.id.movieRating);
-            movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
-            reviewButton = (Button) view.findViewById(R.id.reviewButton);
-            favoriteButton = (Button) view.findViewById(R.id.movieFavorite);
+        movieDate = (TextView) view.findViewById(R.id.movieDate);
+        moviePlot = (TextView) view.findViewById(R.id.moviePlot);
+        movieTitle = (TextView) view.findViewById(R.id.movieTitle);
+        moviePoster = (ImageView) view.findViewById(R.id.moviePoster);
+        movieRating = (RatingBar) view.findViewById(R.id.movieRating);
+        //movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
+        //reviewButton = (Button) view.findViewById(R.id.reviewButton);
+        favoriteButton = (ImageView) view.findViewById(R.id.movieFavorite);
 
-            movieTrailer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    youtubeIntent();
-                }
-            });
+        movieTrailer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                youtubeIntent();
+            }
+        });
 
-            reviewButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getFragmentManager().beginTransaction().replace(R.id.mainFragment,
-                            Review.newInstance("" + movieID)).commit();
-                }
-            });
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().replace(R.id.mainFragment,
+                        Review.newInstance("" + movieID)).commit();
+            }
+        });
 
-            favoriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().getContentResolver().delete(DBContract.MovieEntry.buildLocationUri(movieID),null,null);
-                    //insert();
-                }
-            });
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getContentResolver().delete(DBContract.MovieEntry.buildLocationUri(movieID), null, null);
+                //insert();
+            }
+        });
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(CURSORLOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+        MenuItem menuItem = menu.findItem(R.id.share);
+
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        mShareActionProvider.setShareIntent(createShareForecastIntent());
+    }
+
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=somekye");
+        return shareIntent;
+    }
 
     private void youtubeIntent() {
 

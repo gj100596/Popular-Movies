@@ -83,6 +83,7 @@ public class MovieListFragment extends Fragment {
                     Intent detail = new Intent(getActivity(), DetailActivity.class);
                     Bundle arg = new Bundle();
                     arg.putInt("Position", position);
+                    arg.putString("Type",type);
                     detail.putExtras(arg);
                     startActivity(detail);
                 }

@@ -3,6 +3,7 @@ package gj.udacity.project1.popularmovies.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
 import gj.udacity.project1.popularmovies.Fragments.FavoriteMovieDetailFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieDetailFragment;
@@ -22,7 +23,7 @@ public class DetailActivity extends AppCompatActivity {
         String type = getIntent().getExtras().getString("Type");
 
         if(type.equals(getString(R.string.favorite))){
-            long id = getIntent().getExtras().getInt("ID");
+            long id = getIntent().getExtras().getLong("ID");
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -37,6 +38,12 @@ public class DetailActivity extends AppCompatActivity {
                     .replace(R.id.detailFragment, MovieDetailFragment.newInstance(position))
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detail,menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /*
