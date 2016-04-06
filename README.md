@@ -1,8 +1,10 @@
 # Popular Movies
-This repository is for the Project 1, Popular Movies, for my Udacity Android Nanodegree Program.
+This repository is for the Project 1 & project 2, Popular Movies, for my Udacity Android Nanodegree Program.
 
 ## What the project is?
 This Android Application shows list of Popular as well as highest rated movies to user.Description of movie can also be seen using this app.
+
+It also allow user to mark a movie favorite so that you can watch its information even when you are offline.
 
 ## Note for using it
 You need to get your API Key from https://www.themoviedb.org/ and use it.
