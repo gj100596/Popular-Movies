@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import gj.udacity.project1.popularmovies.Activity.DetailActivity;
 import gj.udacity.project1.popularmovies.Activity.MainActivity;
 import gj.udacity.project1.popularmovies.Adapter.GridViewAdapter;
+import gj.udacity.project1.popularmovies.Data.Connectivity;
 import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
@@ -135,7 +136,12 @@ public class MovieListFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         loading.cancel();
-                        Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_LONG).show();
+                        if(!Connectivity.isConnected(getActivity())){
+                            Toast.makeText(getActivity(),"Please Connect To Internet",Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
         );

@@ -3,7 +3,6 @@ package gj.udacity.project1.popularmovies.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 
 import gj.udacity.project1.popularmovies.Fragments.FavoriteMovieDetailFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieDetailFragment;
@@ -39,20 +38,4 @@ public class DetailActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_detail,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    /*
-    private Intent createShareForecastIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mForecast + FORECAST_SHARE_HASHTAG);
-        return shareIntent;
-    } */
-
 }

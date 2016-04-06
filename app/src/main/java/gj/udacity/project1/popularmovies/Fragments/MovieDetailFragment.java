@@ -2,6 +2,10 @@ package gj.udacity.project1.popularmovies.Fragments;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,12 +26,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import gj.udacity.project1.popularmovies.DBPackage.DBContract;
+import gj.udacity.project1.popularmovies.Data.Connectivity;
 import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.Data.MovieDataClass;
 import gj.udacity.project1.popularmovies.R;
@@ -44,6 +55,8 @@ public class MovieDetailFragment extends Fragment{
     private RatingBar movieRating;
     private LinearLayout movieTrailerList,movieReviewList;
     private ImageView favoriteButton;
+    private boolean alreadyFavorite;
+    private long MovieID;
 
     public static MovieDetailFragment newInstance(int position) {
 
@@ -67,6 +80,7 @@ public class MovieDetailFragment extends Fragment{
 
         if (optionNo != -1) {
             currentMovie = MovieListFragment.movieInfo.get(optionNo);
+            MovieID = currentMovie.getMovieId();
 
             movieDate = (TextView) view.findViewById(R.id.movieDate);
             moviePlot = (TextView) view.findViewById(R.id.moviePlot);
@@ -85,7 +99,7 @@ public class MovieDetailFragment extends Fragment{
         /*Here a new request is being sent to fetch image but actually it won't bring whole image
         back because volley would have cached the imaged previously when it called it first to show list.
          */
-            String url = "http://image.tmdb.org/t/p/w342";
+            final String url = "http://image.tmdb.org/t/p/w342";
             Picasso.with(getActivity())
                     .load(url + currentMovie.getImage())
                     .into(moviePoster);
@@ -95,21 +109,71 @@ public class MovieDetailFragment extends Fragment{
             loadTrailer();
             loadReviews();
 
+            final Cursor cursor = getActivity().getContentResolver()
+                    .query(DBContract.MovieEntry.buildLocationUri(MovieID),
+                            null,null,null,null);
+            if (cursor == null || cursor.getCount() == 0) {
+                favoriteButton.setImageResource(R.drawable.ic_star_border_black_36dp);
+                alreadyFavorite = false;
+            }
+            else {
+                favoriteButton.setImageResource(R.drawable.ic_star_black_36dp);
+                alreadyFavorite = true;
+            }
             favoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    ContentValues values = new ContentValues();
-                    values.put(DBContract.MovieEntry._ID,currentMovie.getMovieId());
-                    values.put(DBContract.MovieEntry.COLUMN_IMAGE_URL,currentMovie.getImage());
-                    values.put(DBContract.MovieEntry.COLUMN_MOVIE_TITLE,currentMovie.getMovieTitle());
-                    values.put(DBContract.MovieEntry.COLUMN_OVERVIEW,currentMovie.getOverview());
-                    values.put(DBContract.MovieEntry.COLUMN_VOTE_AVG,currentMovie.getVoteAvg());
-                    values.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE,currentMovie.getReleaseDate());
+                    if(alreadyFavorite){
+                        favoriteButton.setImageResource(R.drawable.ic_star_border_black_36dp);
+                        getActivity().getContentResolver().delete(DBContract.MovieEntry.CONTENT_URI,
+                                null, new String[]{""+ MovieID});
+                        Toast.makeText(getActivity(),"Movie Removed From Favorites",Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        ContentValues values = new ContentValues();
+                        values.put(DBContract.MovieEntry._ID, MovieID);
+                        values.put(DBContract.MovieEntry.COLUMN_IMAGE_URL, currentMovie.getImage());
+                        values.put(DBContract.MovieEntry.COLUMN_MOVIE_TITLE, currentMovie.getMovieTitle());
+                        values.put(DBContract.MovieEntry.COLUMN_OVERVIEW, currentMovie.getOverview());
+                        values.put(DBContract.MovieEntry.COLUMN_VOTE_AVG, currentMovie.getVoteAvg());
+                        values.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE, currentMovie.getReleaseDate());
 
-                    getActivity().getContentResolver().insert(DBContract.BASE_URI,values);
-                    favoriteButton.setImageResource(R.drawable.ic_star_black_36dp);
-                    //insert();
+                        getActivity().getContentResolver().insert(DBContract.BASE_URI, values);
+
+                        Picasso.with(getActivity())
+                                .load(url + currentMovie.getImage())
+                                .into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        try {
+                                            File savePoster =
+                                                    new File(getActivity().getFilesDir() + "/" + MovieID + ".jpg");
+                                            FileOutputStream outputStream = new FileOutputStream(savePoster);
+
+                                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                                            outputStream.flush();
+                                            outputStream.close();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onBitmapFailed(Drawable errorDrawable) {
+
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                    }
+                                });
+
+                        favoriteButton.setImageResource(R.drawable.ic_star_black_36dp);
+                        Toast.makeText(getActivity(),"Movie Added As Favorites",Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -117,7 +181,7 @@ public class MovieDetailFragment extends Fragment{
     }
 
     private void loadTrailer() {
-        String url = "http://api.themoviedb.org/3/movie/" + currentMovie.getMovieId() + "/videos?&api_key=" + FixedData.API;
+        String url = "http://api.themoviedb.org/3/movie/" + MovieID + "/videos?&api_key=" + FixedData.API;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -145,20 +209,20 @@ public class MovieDetailFragment extends Fragment{
                                         .into(trailerImage);
 
                                 movieTrailerList.addView(trailerImage);
-                            }
-                            assert trailerImage != null;
-                            trailerImage.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent youtube = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" +
-                                            v.getTag().toString()));
-                                    getActivity().startActivity(youtube);
-                                }
-                            });
 
+                                trailerImage.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent youtube = new Intent(
+                                                Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" +
+                                                v.getTag().toString()));
+                                        getActivity().startActivity(youtube);
+                                    }
+                                });
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        } catch (NullPointerException e){}
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -174,7 +238,7 @@ public class MovieDetailFragment extends Fragment{
     }
 
     private void loadReviews() {
-        String url = "http://api.themoviedb.org/3/movie/" + currentMovie.getMovieId() + "/reviews?&api_key=" + FixedData.API;
+        String url = "http://api.themoviedb.org/3/movie/" + MovieID + "/reviews?&api_key=" + FixedData.API;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -185,25 +249,22 @@ public class MovieDetailFragment extends Fragment{
                             for (int position = 0; position < reviewsArray.length(); position++) {
                                 JSONObject reviewDetail = new JSONObject(reviewsArray.getString(position));
 
-                                LinearLayout review = new LinearLayout(movieReviewList.getContext());
-                                review.setOrientation(LinearLayout.VERTICAL);
-
-                                TextView author = new TextView(review.getContext());
-                                author.setText(reviewDetail.getString("author"));
-                                TextView comment = new TextView(review.getContext());
-                                author.setText(reviewDetail.getString("content"));
-
-                                review.addView(author);
-                                review.addView(comment);
-
-                                review.setPadding(10, 0, 10, 0);
-
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams mainParams = new LinearLayout.LayoutParams(
                                         ViewGroup.LayoutParams.MATCH_PARENT,
                                         ViewGroup.LayoutParams.WRAP_CONTENT);
-                                review.setLayoutParams(params);
 
-                                movieReviewList.addView(review);
+                                TextView author = new TextView(movieReviewList.getContext());
+                                author.setText(reviewDetail.getString("author"));
+                                author.setLayoutParams(mainParams);
+                                author.setTextSize(22);
+                                author.setTextColor(Color.BLACK);
+                                TextView comment = new TextView(movieReviewList.getContext());
+                                comment.setText(reviewDetail.getString("content"));
+                                comment.setLayoutParams(mainParams);
+                                comment.setTextSize(12);
+
+                                movieReviewList.addView(author);
+                                movieReviewList.addView(comment);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -213,7 +274,12 @@ public class MovieDetailFragment extends Fragment{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
+                        if(!Connectivity.isConnected(getActivity())){
+                            Toast.makeText(getActivity(),"Please Connect To Internet",Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
         );

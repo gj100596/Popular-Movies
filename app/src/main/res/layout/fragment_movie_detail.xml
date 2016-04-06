@@ -92,6 +92,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/trailerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -117,15 +118,16 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:id="@+id/movieTrailerList"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
             </HorizontalScrollView>
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/reviewLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -146,16 +148,11 @@
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:background="@android:color/black" />
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:id="@+id/movieReviewList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </HorizontalScrollView>
+            <LinearLayout
+                android:id="@+id/movieReviewList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
         </LinearLayout>
 

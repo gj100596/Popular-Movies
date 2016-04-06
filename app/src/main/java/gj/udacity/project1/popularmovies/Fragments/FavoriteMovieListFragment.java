@@ -21,7 +21,7 @@ import gj.udacity.project1.popularmovies.DBPackage.DBCursorAdapter;
 import gj.udacity.project1.popularmovies.R;
 
 /*
-This fragment load list of favorite movies from database
+This fragment load list of favorite movies from database.
  */
 public class FavoriteMovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -46,6 +46,13 @@ public class FavoriteMovieListFragment extends Fragment implements LoaderManager
 
         container = (GridView) view.findViewById(R.id.container);
 
+        /**
+         * On Click on any item of grid should show the detail of it.
+         * So we inflate the fragment Favourite Movie Detail Fragment.
+         * But here there are 2 option:
+         * 1) If it is tablet load fragment.
+         * 2) And if it is phone then start detail activity which will load the fragment.
+         */
         container.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -80,16 +87,39 @@ public class FavoriteMovieListFragment extends Fragment implements LoaderManager
         super.onActivityCreated(savedInstanceState);
     }
 
+    /**
+     * When user will remove any movie from his/her favorite list, onBackPress() will be called
+     * At that time this method will be called
+     * loadSaveMovie() is called again so that the new list is totally updated removing the removed movie.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadSavedMovie();
+    }
+
     private void loadSavedMovie() {
         String sortOrder = DBContract.MovieEntry.COLUMN_RELEASE_DATE + " ASC";
 
         Cursor cur = getActivity().getContentResolver().query(DBContract.MovieEntry.CONTENT_URI,
                 null/*new String[]{DBContract.MovieEntry.COLUMN_IMAGE_URL}*/, null, null, sortOrder);
 
-         cursorAdapter = new DBCursorAdapter(getActivity(), cur, 0);
-
+        cursorAdapter = new DBCursorAdapter(getActivity(), cur, 0);
         container.setAdapter(cursorAdapter);
+
+        if (MainActivity.tabletDevice) {
+            cur.moveToFirst();
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.detailFragment,
+                            FavoriteMovieDetailFragment.newInstance(cur.getLong(0)))
+                    .commit();
+        }
     }
+
+    /**
+     * This are the methods for setting up cursor
+     */
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

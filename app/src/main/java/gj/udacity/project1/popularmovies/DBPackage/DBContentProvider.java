@@ -60,11 +60,14 @@ public class DBContentProvider extends ContentProvider {
         return null;
     }
 
+    /**
+     * This function gives a specific favorite movies
+     */
     private Cursor getFavoriteMovieDetail(Uri uri, String[] projection, String sortOrder) {
         String MovieIDSelectionString = DBContract.MovieEntry.TABLE+
                 "." + DBContract.MovieEntry._ID + "=?";
 
-        return mOpenHelper.getReadableDatabase().query(
+        Cursor cursor =  mOpenHelper.getReadableDatabase().query(
                 DBContract.MovieEntry.TABLE,
                 projection,
                 MovieIDSelectionString,
@@ -73,8 +76,13 @@ public class DBContentProvider extends ContentProvider {
                 null,
                 sortOrder
         );
+        cursor.moveToFirst();
+        return cursor;
     }
 
+    /**
+     * This function gives all the favorite movies
+     */
     private Cursor getAllFavoriteMovies(String[] projection, String sortOrder) {
 
         return mOpenHelper.getReadableDatabase().query(
@@ -88,6 +96,9 @@ public class DBContentProvider extends ContentProvider {
         );
     }
 
+    /**
+     * This function add a movie in favorite list
+     */
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
@@ -97,9 +108,15 @@ public class DBContentProvider extends ContentProvider {
         return DBContract.MovieEntry.buildLocationUri(id);
     }
 
+    /**
+     * This function delete movie from favorite list
+     */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int rowDeleted  = mOpenHelper.getWritableDatabase().delete(DBContract.MovieEntry.TABLE,selection,selectionArgs);
+        String MovieIDSelectionString = DBContract.MovieEntry.TABLE+
+                "." + DBContract.MovieEntry._ID + "=?";
+        int rowDeleted  = mOpenHelper.getWritableDatabase().delete(DBContract.MovieEntry.TABLE
+                ,MovieIDSelectionString,selectionArgs);
         if(rowDeleted != 0)
             getContext().getContentResolver().notifyChange(uri, null);
         return rowDeleted;

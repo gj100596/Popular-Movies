@@ -7,14 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import gj.udacity.project1.popularmovies.Data.Connectivity;
 import gj.udacity.project1.popularmovies.Fragments.FavoriteMovieListFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieDetailFragment;
 import gj.udacity.project1.popularmovies.Fragments.MovieListFragment;
@@ -60,44 +61,28 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                //Start Popular Fragment when simple 0th position is click(No rotation things)
-                if (position == 0 && savedInstanceState == null)
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.popular)), getString(R.string.popular))
-                            .commit();
-                    //Once Device is rotated then saveInsatnceState!=null
-                    //At that time when 0th option is selected this method will be called
-                else if (position == 0) {
-                    //Check which fragment was there before rotation
-                    int lastSpinnerOption = savedInstanceState.getInt("Position");
-
-                    //If Highest Rating was there that means user now want Popular movie Fragment, so start it
-                    if (lastSpinnerOption == 1) {
+                switch (position) {
+                    case 0:
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.popular)), getString(R.string.popular))
+                                .replace(R.id.mainFragment,
+                                        MovieListFragment.newInstance(getString(R.string.popular)),
+                                        getString(R.string.popular))
                                 .commit();
-                    }
-                    //And if 0th is clicked when last Fragment was in Popular Fragment no change needed.
-                }
-
-                //Same stuff for option 1.
-                else if (position == 1 && savedInstanceState == null)
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.rating)), getString(R.string.rating))
-                            .commit();
-                else if (position == 1) {
-                    int lastSpinnerOption = savedInstanceState.getInt("Position");
-                    if (lastSpinnerOption == 0) {
+                        break;
+                    case 1:
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.mainFragment, MovieListFragment.newInstance(getString(R.string.rating)), getString(R.string.rating))
+                                .replace(R.id.mainFragment,
+                                        MovieListFragment.newInstance(getString(R.string.rating)),
+                                        getString(R.string.rating))
                                 .commit();
-                    }
-                }
-                else if(position == 2){
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.mainFragment, FavoriteMovieListFragment.newInstance(), getString(R.string.favorite))
-                            .commit();
+                        break;
+                    case 2:
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.mainFragment,
+                                        FavoriteMovieListFragment.newInstance(),
+                                        getString(R.string.favorite))
+                                .commit();
+                        break;
                 }
             }
 
@@ -105,20 +90,13 @@ public class MainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("Position", spinner.getSelectedItemPosition());
-        super.onSaveInstanceState(outState);
-
-    }
-
-    //As the Back(Home) button is showed in fragment, I cannot define parent activity in it
-    //So I have overridden the onOptionItemSelected method.
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        //If user is not connected to user send him/her to favorite page
+        if(!Connectivity.isConnected(this)){
+            Toast.makeText(MainActivity.this, "You are not Connected to Internet. Please Connect to see other content!",
+                    Toast.LENGTH_SHORT).show();
+            spinner.setSelection(2);
+        }
     }
 
     /*

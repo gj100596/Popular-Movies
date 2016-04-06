@@ -1,41 +1,25 @@
 package gj.udacity.project1.popularmovies.Fragments;
 
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.ShareActionProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import gj.udacity.project1.popularmovies.DBPackage.DBContract;
 import gj.udacity.project1.popularmovies.DBPackage.DBContract.MovieEntry;
-import gj.udacity.project1.popularmovies.Data.FixedData;
 import gj.udacity.project1.popularmovies.R;
 
 /*
@@ -57,8 +41,7 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
             MovieEntry.COLUMN_VOTE_AVG
     };
 
-    // these constants correspond to the projection defined above, and must change if the
-    // projection changes
+    // these constants correspond to the projection defined above
     private static final int ID_PROJECTION_NO = 0;
     private static final int IMAGE_PROJECTION_NO = 1;
     private static final int TITLE_PROJECTION_NO = 2;
@@ -68,9 +51,10 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
 
 
     private ImageView moviePoster;
-    private TextView movieTitle, moviePlot, movieDate, movieTrailer;
+    private TextView movieTitle, moviePlot, movieDate;
     private RatingBar movieRating;
-    private ImageView reviewButton, favoriteButton;
+    private ImageView favoriteButton;
+    private LinearLayout trailerLayout,reviewLayout;
 
     public static FavoriteMovieDetailFragment newInstance(long id) {
 
@@ -85,7 +69,6 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         movieID = getArguments().getLong(ARG);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -98,30 +81,27 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
         movieTitle = (TextView) view.findViewById(R.id.movieTitle);
         moviePoster = (ImageView) view.findViewById(R.id.moviePoster);
         movieRating = (RatingBar) view.findViewById(R.id.movieRating);
-        //movieTrailer = (TextView) view.findViewById(R.id.movieTrailer);
-        //reviewButton = (Button) view.findViewById(R.id.reviewButton);
         favoriteButton = (ImageView) view.findViewById(R.id.movieFavorite);
+        trailerLayout = (LinearLayout) view.findViewById(R.id.trailerLayout);
+        reviewLayout = (LinearLayout) view.findViewById(R.id.reviewLayout);
 
-        movieTrailer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                youtubeIntent();
-            }
-        });
+        trailerLayout.setVisibility(View.GONE);
+        reviewLayout.setVisibility(View.GONE);
+        moviePoster.setImageBitmap(BitmapFactory.decodeFile(getActivity().getFilesDir() + "/" + movieID + ".jpg"));
 
-        reviewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.mainFragment,
-                        Review.newInstance("" + movieID)).commit();
-            }
-        });
-
+        favoriteButton.setImageResource(R.drawable.ic_star_black_36dp);
+        /**
+         * Again clicking the star means removing movie from favorite list.
+         * So this method delete that movie from DB.
+         * And go to favorite movie list again
+         */
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getContentResolver().delete(DBContract.MovieEntry.buildLocationUri(movieID), null, null);
-                //insert();
+                getActivity().getContentResolver().delete(MovieEntry.CONTENT_URI,
+                        null, new String[]{""+movieID});
+                favoriteButton.setImageResource(R.drawable.ic_star_border_black_36dp);
+                getActivity().onBackPressed();
             }
         });
         return view;
@@ -131,55 +111,6 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(CURSORLOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_detail, menu);
-        MenuItem menuItem = menu.findItem(R.id.share);
-
-        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-
-        mShareActionProvider.setShareIntent(createShareForecastIntent());
-    }
-
-    private Intent createShareForecastIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=somekye");
-        return shareIntent;
-    }
-
-    private void youtubeIntent() {
-
-        String url = "http://api.themoviedb.org/3/movie/" + movieID + "/videos?&api_key=" + FixedData.API;
-        JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        String trailerKey = null;
-                        try {
-                            trailerKey = jsonObject.getJSONArray("results").getJSONObject(0).getString("key");
-                            Log.e("ssd", trailerKey);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.e("sd", "Sdsd");
-                        }
-                        Intent youtube = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerKey));
-                        startActivity(youtube);
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-
-                    }
-                }
-        );
-
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-        queue.add(detail);
     }
 
     @Override
@@ -200,9 +131,6 @@ public class FavoriteMovieDetailFragment extends Fragment implements LoaderManag
         movieTitle.setText(data.getString(TITLE_PROJECTION_NO));
         movieDate.setText(data.getString(RELEASE_PROJECTION_NO));
 
-        /*Here a new request is being sent to fetch image but actually it won't bring whole image
-        back because volley would have cached the imaged previously when it called it first to show list.
-         */
         String url = "http://image.tmdb.org/t/p/w342";
         Picasso.with(getActivity())
                 .load(url + data.getString(IMAGE_PROJECTION_NO))
