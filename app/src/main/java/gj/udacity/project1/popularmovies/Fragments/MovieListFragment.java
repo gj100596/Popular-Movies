@@ -103,9 +103,9 @@ public class MovieListFragment extends Fragment {
 
         String url;
         if (type.equalsIgnoreCase(getString(R.string.popular)))
-            url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" + FixedData.API;
+            url = "http://api.themoviedb.org/3/movie/popular?api_key=" + FixedData.API;
         else
-            url = "http://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&api_key=" + FixedData.API;
+            url = "http://api.themoviedb.org/3/movie/top_rated?api_key=" + FixedData.API;
         JsonObjectRequest page = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
