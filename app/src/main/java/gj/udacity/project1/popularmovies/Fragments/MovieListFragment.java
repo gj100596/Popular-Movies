@@ -3,7 +3,9 @@ package gj.udacity.project1.popularmovies.Fragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +45,7 @@ public class MovieListFragment extends Fragment {
     private GridView container;
     static ArrayList<MovieDataClass> movieInfo;
     private String type;
+    private FragmentActivity mContext;
 
     public static MovieListFragment newInstance(String type) {
         MovieListFragment fragment = new MovieListFragment();
@@ -67,7 +70,6 @@ public class MovieListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_movie_list, containerView, false);
 
-        movieInfo = new ArrayList<>(0);
 
         container = (GridView) view.findViewById(R.id.container);
 
@@ -84,16 +86,22 @@ public class MovieListFragment extends Fragment {
                     Intent detail = new Intent(getActivity(), DetailActivity.class);
                     Bundle arg = new Bundle();
                     arg.putInt("Position", position);
-                    arg.putString("Type",type);
+                    arg.putString("Type", type);
                     detail.putExtras(arg);
                     startActivity(detail);
                 }
             }
         });
-
-        loadMovieData();
+        movieInfo = new ArrayList<>(0);
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mContext = getActivity();
+        loadMovieData();
     }
 
     private void loadMovieData() {
@@ -118,7 +126,7 @@ public class MovieListFragment extends Fragment {
                             for (int i = 0; i < movies.length(); i++)
                                 movieInfo.add(new MovieDataClass(movies.getJSONObject(i)));
 
-                            container.setAdapter(new GridViewAdapter(getContext(), movieInfo));
+                            container.setAdapter(new GridViewAdapter(mContext, movieInfo));
 
                             if (MainActivity.tabletDevice) {
                                 getActivity().getSupportFragmentManager()
@@ -137,10 +145,10 @@ public class MovieListFragment extends Fragment {
                     public void onErrorResponse(VolleyError volleyError) {
                         loading.cancel();
                         if(!Connectivity.isConnected(getActivity())){
-                            Toast.makeText(getActivity(),"Please Connect To Internet",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext,"Please Connect To Internet",Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            Toast.makeText(getActivity(), "Error Occurred! " + volleyError.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, "Error Occurred! " + volleyError.toString(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }

@@ -100,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    This adapter is for spinner
-    I din't wrote this whole Adapter, it was pre-written when I selected activity with spinner
-    But I understood the code and even tried removing it, which result just change in color of drop-down menu
-    Hence this Adapter is for theming the drop down of spinner.
-     */
+        This adapter is for spinner
+        I din't wrote this whole Adapter, it was pre-written when I selected activity with spinner
+        But I understood the code and even tried removing it, which result just change in color of drop-down menu
+        Hence this Adapter is for theming the drop down of spinner.
+         */
     private static class MyAdapter extends ArrayAdapter<String> implements ThemedSpinnerAdapter {
         private final ThemedSpinnerAdapter.Helper mDropDownHelper;
 
