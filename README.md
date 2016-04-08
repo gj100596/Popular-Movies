@@ -10,8 +10,8 @@ It also allow user to mark a movie favorite so that you can watch its informatio
 You need to get your API Key from https://www.themoviedb.org/ and use it.
 There are 2 way of using it:
 
-1) Enter the key at line 92 & 94 in MovieListFragment file
+1) Create a class named FixedData and make a static String member API in it. Put your key into that member.
 
-2) Create a class named FixedData and make a static String member API in it. Put your key into that member.
+2) Enter the key at line 92 & 94 in MovieListFragment file, line 184 & 241 in MovieDetailFragment File
 
 
