@@ -1,6 +1,7 @@
 package gj.udacity.project1.popularmovies.Adapter;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,8 +22,12 @@ public class GridViewAdapter extends ArrayAdapter {
     private ArrayList<MovieDataClass> movieList;
     private Context context;
 
+    class ViewHolder {
+        ImageView moviePoster;
+    }
+
     public GridViewAdapter(Context context, ArrayList<MovieDataClass> movieList) {
-        super(context,movieList.size());
+        super(context, movieList.size());
         this.movieList = movieList;
         this.context = context;
     }
@@ -34,16 +39,28 @@ public class GridViewAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        ViewHolder holder;
+
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.movie_grid_image, parent, false);
+            holder = new ViewHolder();
+            holder.moviePoster = (ImageView) convertView.findViewById(R.id.imageViewInGrid);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
 
         String url = "http://image.tmdb.org/t/p/w342";
-        ImageView imageView = new ImageView(context);
 
         Picasso.with(context)
-                .load(url+movieList.get(position).getImage())
+                .load(url + movieList.get(position).getImage())
                 .placeholder(R.drawable.placeholder)
-                .into(imageView);
+                .into(holder.moviePoster);
 
-        return imageView;
+        return convertView;
     }
 }
 
