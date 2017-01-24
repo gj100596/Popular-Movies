@@ -1,1 +1,1 @@
-include ':app', ':volley'
+include ':app', ':volley', ':mint-android-sdk-5.2.1'

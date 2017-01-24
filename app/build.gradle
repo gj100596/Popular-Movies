@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+//apply plugin: 'com.splunk.mint.gradle.android.plugin'
 
 android {
     compileSdkVersion 23
@@ -11,6 +12,21 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    /*
+    buildscript {
+        repositories {
+            maven {
+                url uri('mint-plugin-repo-5.2.1')
+            }
+            // Will need to add jcenter repo OR mavenCentral
+            mavenCentral()
+            maven()
+        }
+        dependencies {
+            classpath 'com.splunk:mint-gradle-android-plugin:5.2.1'
+        }
+    }
+    */
     buildTypes {
         release {
             minifyEnabled false
@@ -21,14 +37,20 @@ android {
 
 repositories {
     mavenCentral()
+    maven {
+        url uri('mint-plugin-repo-5.2.1')
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile project(path: ':volley')
+    compile project(path: ':mint-android-sdk-5.2.1')
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
+   // compile 'com.splunk:mint-android-sdk:5.2.1'
+ //   compile 'com.splunk:mint-android-instrumentation-okhttp:5.2.1'
 }

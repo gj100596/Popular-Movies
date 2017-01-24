@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.splunk.mint.Mint;
+
 
 import gj.udacity.project1.popularmovies.Data.Connectivity;
 import gj.udacity.project1.popularmovies.Fragments.FavoriteMovieListFragment;
@@ -36,9 +38,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Mint.initAndStartSession(this.getApplication(), "47614951");
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        String a = null;
+        a.toString();
 
         if (findViewById(R.id.detailFragment) != null) {
             tabletDevice = true;

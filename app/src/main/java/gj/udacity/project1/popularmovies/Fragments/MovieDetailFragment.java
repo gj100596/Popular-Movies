@@ -238,7 +238,7 @@ public class MovieDetailFragment extends Fragment{
     }
 
     private void loadReviews() {
-        String url = "http://api.themoviedb.org/3/movie/" + MovieID + "/reviews?&api_key=" + FixedData.API;
+        String url = "http://api.themoviedb.org/3/movie/" + MovieID + "11/reviews?&api_key=" + FixedData.API;
         JsonObjectRequest detail = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -274,6 +274,8 @@ public class MovieDetailFragment extends Fragment{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        volleyError.getMessage();
+                        String s  = new String(volleyError.networkResponse.data);
                         if(!Connectivity.isConnected(getActivity())){
                             Toast.makeText(getActivity(),"Please Connect To Internet",Toast.LENGTH_SHORT).show();
                         }
